@@ -1,0 +1,80 @@
+#:kivy 1.0.9
+
+
+<MainMenuScreenManager>:
+
+
+<GameChooseLayout>:
+    padding: 0.001 * self.width
+    canvas:
+        Color:
+            rgba: 0.3, 0.3, 0.3, 0.8
+
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Button:
+        size_hint: 1 / 4, 1 / 4
+        pos_hint: {'center_x': 0.25, 'center_y': 0.75}
+    Button:
+        size_hint: 1 / 4, 1 / 4
+        pos_hint: {'center_x': 0.75, 'center_y': 0.25}
+    Button:
+        size_hint: 1 / 4, 1 / 4
+        pos_hint: {'center_x': 0.75, 'center_y': 0.75}
+    Button:
+        size_hint: 1 / 4, 1 / 4
+        pos_hint: {'center_x': 0.25, 'center_y': 0.25}
+
+
+<MainMenuBar@FloatLayout>:
+    orientation: 'vertical'
+    size_hint: None, 1
+
+
+    canvas:
+        Color:
+            rgba: 0.0, 0.0, 0.0, 0.8
+
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<StartGameButton>:
+    text: "Zagraj"
+
+
+<ExitButton>:
+    text: "Wyjdz"
+    on_release: quit()
+
+
+<GuessrGame>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        size: root.width, root.height
+        MainMenuBar:
+            pos_hint: {'center_x': 0.2, 'center_y': 0.5}
+            size: (root.width / 4), root.height
+
+            StartGameButton:
+                pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+                size_hint: (7 / 8), (1 / 12)
+
+            ExitButton:
+                pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+                size_hint: (7 / 8), (1 / 12)
+
+
+        GameChooseLayout:
+            size_hint: None, None
+            size: 3 * root.width / 8, root.height / 2
+            pos_hint: {'center_x': 0.65, 'center_y': 0.5}
