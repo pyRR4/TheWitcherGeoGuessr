@@ -1,7 +1,7 @@
 #:kivy 1.0.9
 
 
-<MainMenuScreenManager>:
+<OptionsLayout>:
 
 
 <GameChooseLayout>:
@@ -14,17 +14,18 @@
             pos: self.pos
             size: self.size
 
-    Button:
-        size_hint: 1 / 4, 1 / 4
+    GameChooseButton:
+        size_hint: 1 / 3, 1 / 3
         pos_hint: {'center_x': 0.25, 'center_y': 0.75}
-    Button:
-        size_hint: 1 / 4, 1 / 4
+        on_release: self.launch_basic_guessr()
+    GameChooseButton:
+        size_hint: 1 / 3, 1 / 3
         pos_hint: {'center_x': 0.75, 'center_y': 0.25}
-    Button:
-        size_hint: 1 / 4, 1 / 4
+    GameChooseButton:
+        size_hint: 1 / 3, 1 / 3
         pos_hint: {'center_x': 0.75, 'center_y': 0.75}
-    Button:
-        size_hint: 1 / 4, 1 / 4
+    GameChooseButton:
+        size_hint: 1 / 3, 1 / 3
         pos_hint: {'center_x': 0.25, 'center_y': 0.25}
 
 
@@ -51,7 +52,8 @@
     on_release: quit()
 
 
-<GuessrGame>:
+<MainMenu>:
+    game_choose_layout: game_choose_layout
     canvas:
         Color:
             rgba: 1, 1, 1, 1
@@ -75,6 +77,8 @@
 
 
         GameChooseLayout:
+            id: game_choose_layout
+            opacity: 0
             size_hint: None, None
-            size: 3 * root.width / 8, root.height / 2
-            pos_hint: {'center_x': 0.65, 'center_y': 0.5}
+            size: root.width / 2, 2 * root.height / 3
+            pos_hint: {'center_x': 0.6, 'center_y': 0.5}
