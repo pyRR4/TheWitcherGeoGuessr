@@ -1,6 +1,40 @@
 #:kivy 1.0.9
 
+<ImagesScatter>:
+    do_rotation: False
+    do_translation: True
+    do_scale: True
+    auto_bring_to_front: False
+    do_collide_after_children: True
+    scale_min: 1.0
+    scale_max: 10.0
+
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 0.1
+
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<ImageWidget@ImagesScatter>:
+    Image:
+        source: 'images/2.jpg'
+        fit_mode: "fill"
+        size: self.parent.size
+        pos: self.parent.pos
+
+<MapWidget@ImagesScatter>:
+    Image:
+        source: 'images/7.jpg'
+        fit_mode: "fill"
+        size: self.parent.size
+        pos: self.parent.pos
+
 <GameScreen>:
+    size_hint: 1, 1
+    size: root.width, root.height
     canvas:
         Color:
             rgba: 0.6, 0.3, 0.6, 1
@@ -9,3 +43,26 @@
             pos: self.pos
             size: self.size
 
+
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                rgba: 0, 0, 0, 0.8
+
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        FloatLayout:
+            size_hint: 1, 1
+            BoxStencil:
+                size_hint: 0.4, 0.4
+                pos_hint: {'center_x': 0.75, 'center_y': 0.7}
+                ImageWidget:
+
+            BoxStencil:
+                size_hint: 0.4, 0.4
+                pos_hint: {'center_x': 0.25, 'center_y': 0.7}
+                MapWidget:

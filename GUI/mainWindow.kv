@@ -1,20 +1,37 @@
 #:kivy 1.0.9
 
-
-<OptionsLayout>:
-
-
-<GameChooseLayout>:
+<BaseMenuLayout>
+    size_hint: 1 / 2, 2 / 3
+    pos_hint: {'center_x': 0.6, 'center_y': 0.5}
     padding: 0.001 * self.width
     canvas:
         Color:
-            rgba: 0.3, 0.3, 0.3, 0.8
+            rgba: 0.0, 0.0, 0.0, 0.8
 
         Rectangle:
             pos: self.pos
             size: self.size
 
+
+<OptionsLayout>:
+    BoxLayout:
+        BoxLayout:
+
+        BoxLayout:
+
+<AnimationScreen>:
+    canvas:
+        Color:
+            rgba: 0, 0, 0, 1
+
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<GameChooseLayout>
     GameChooseButton:
+        text: "Basic Guessr"
         size_hint: 1 / 3, 1 / 3
         pos_hint: {'center_x': 0.25, 'center_y': 0.75}
         on_release: self.launch_basic_guessr()
@@ -29,7 +46,7 @@
         pos_hint: {'center_x': 0.25, 'center_y': 0.25}
 
 
-<MainMenuBar@FloatLayout>:
+<MainMenuBar>:
     orientation: 'vertical'
     size_hint: None, 1
 
@@ -47,19 +64,19 @@
     text: "Zagraj"
 
 
+<OptionsButton>:
+    text: "Opcje"
+
+
 <ExitButton>:
     text: "Wyjdz"
     on_release: quit()
 
 
 <MainMenu>:
-    game_choose_layout: game_choose_layout
-    canvas:
-        Color:
-            rgba: 1, 1, 1, 1
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    Image:
+        source: 'images/8.jpg'
+        allow_stretch: True
 
     FloatLayout:
         size: root.width, root.height
@@ -71,14 +88,10 @@
                 pos_hint: {'center_x': 0.5, 'center_y': 0.7}
                 size_hint: (7 / 8), (1 / 12)
 
+            OptionsButton:
+                pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+                size_hint: (7 / 8), (1 / 12)
+
             ExitButton:
                 pos_hint: {'center_x': 0.5, 'center_y': 0.2}
                 size_hint: (7 / 8), (1 / 12)
-
-
-        GameChooseLayout:
-            id: game_choose_layout
-            opacity: 0
-            size_hint: None, None
-            size: root.width / 2, 2 * root.height / 3
-            pos_hint: {'center_x': 0.6, 'center_y': 0.5}

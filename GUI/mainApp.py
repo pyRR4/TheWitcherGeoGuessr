@@ -4,7 +4,7 @@ from kivy.app import App
 from kivy.lang import Builder
 
 from TheWitcherGeoGuessr.GUI.gameWindow import GameScreen
-from TheWitcherGeoGuessr.GUI.mainWindow import MainMenu, MainMenuScreenManager
+from TheWitcherGeoGuessr.GUI.mainWindow import MainMenu, MainMenuScreenManager, AnimationScreen
 
 kivy.require('2.3.0')
 
@@ -24,6 +24,7 @@ class GuessrApp(App):
         self.sm = MainMenuScreenManager()
         self.sm.add_widget(MainMenu(name='menu'))
         self.sm.add_widget(GameScreen(name='guessr_game'))
+        self.sm.add_widget(AnimationScreen(name='animation_screen'))
 
         return self.sm
 
