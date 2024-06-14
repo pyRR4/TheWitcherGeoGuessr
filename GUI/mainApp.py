@@ -1,10 +1,9 @@
 import kivy
 from kivy.config import ConfigParser
 from kivy.app import App
-from kivy.lang import Builder
 
-from TheWitcherGeoGuessr.GUI.gameWindow import GameScreen
-from TheWitcherGeoGuessr.GUI.mainWindow import MainMenu, MainMenuScreenManager, AnimationScreen
+from .gameWindow import GameScreen
+from .mainWindow import MainMenu, MainMenuScreenManager, AnimationScreen
 
 kivy.require('2.3.0')
 
@@ -34,4 +33,6 @@ class GuessrApp(App):
         Config.set('graphics', 'fullscreen', 1)
         Config.set('graphics', 'width', width)
         Config.set('graphics', 'height', height)
+        Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
+        Config.set('input', 'showtouch', '0')
 
