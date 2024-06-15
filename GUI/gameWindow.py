@@ -1,5 +1,6 @@
 from kivy.graphics.transformation import Matrix
 from kivy.lang import Builder
+from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.screenmanager import Screen
@@ -8,11 +9,48 @@ from kivy.graphics import Ellipse, Color
 
 
 class BoxStencil(BoxLayout, StencilView):
-    pass
+    def update(self):
+        pass
+
+
+class MapBox(BoxStencil):
+
+    def __init__(self, **kwargs):
+        super(MapBox, self).__init__(**kwargs)
+        self.selected_point = None
+        self.point_to_draw = None
+        self.point_instruction = None
+
+    def on_touch_down(self, touch):
+        if self.parent.parent.collide_point(touch.x, touch.y):
+            if touch.button == 'left':
+                self.point_to_draw = self.to_local(touch.x, touch.y)
+                self.draw_point()
+                transformation = self.children[0].transform
+                x, y = self.point_to_draw
+                self.selected_point = transformation.inverse().transform_point(x, y, 0)
+                print(self.selected_point)
+                self.children[0].update()
+            super(MapBox, self).on_touch_down(touch)
+
+    def draw_point(self):
+        if self.point_to_draw is not None:
+            if self.point_instruction:
+                self.canvas.remove(self.point_instruction)
+            with self.canvas:
+                Color(1, 0, 0)
+                self.point_instruction = Ellipse(pos=(self.point_to_draw[0] - 2.5, self.point_to_draw[1] - 2.5),
+                                                 size=(5, 5))
+
+    def update(self):
+        if self.point_to_draw is not None:
+            transformation = self.children[0].transform
+            x, y, z = self.selected_point
+            self.point_to_draw = transformation.transform_point(x, y, z)
+            self.draw_point()
 
 
 class ImagesScatter(ScatterLayout):
-
     def __init__(self, **kwargs):
         super(ImagesScatter, self).__init__(**kwargs)
         self.dragging = False
@@ -22,31 +60,22 @@ class ImagesScatter(ScatterLayout):
         if self.parent.collide_point(touch.x, touch.y):
             if touch.is_mouse_scrolling:
                 if touch.button == 'scrolldown':
-                    self.zoom_to_mouse(touch)
-                    # if self.scale < self.scale_max:
-                    #     self.scale = min(self.scale * 1.1, self.scale_max)
+                    if self.scale < self.scale_max:
+                        self.scale = min(self.scale * 1.1, self.scale_max)
+                    self.parent.update()
                 elif touch.button == 'scrollup':
-                    self.zoom_to_mouse(touch)
-                    # if self.scale > self.scale_min:
-                    #     self.scale = max(self.scale * 0.8, self.scale_min)
+                    if self.scale > self.scale_min:
+                        self.scale = max(self.scale * 0.8, self.scale_min)
+                    self.parent.update()
                 self.clamp_to_box_stencil()
             elif touch.button == 'right':
                 self.dragging = True
                 self.last_touch = touch
+                self.parent.update()
+            elif touch.button == 'left':
+                pass
             else:
                 super(ImagesScatter, self).on_touch_down(touch)
-
-    def zoom_to_mouse(self, touch):
-        scale = min(self.width / self.parent.parent.width, self.height / self.parent.parent.height)
-        center_x = touch.pos[0] - self.x
-        center_y = touch.pos[1] - self.y
-
-        # Tworzenie macierzy transformacji
-        trans = Matrix().translate(center_x - self.center_x, center_y - self.center_y, 0).scale(scale, scale, scale)
-
-        # Stosowanie transformacji
-        self.apply_transform(trans)
-        self.clamp_to_box_stencil()
 
     def on_touch_up(self, touch):
         if self.dragging and touch is self.last_touch:
@@ -61,6 +90,7 @@ class ImagesScatter(ScatterLayout):
             dy = touch.dy
             self.apply_transform(Matrix().translate(dx, dy, 0))
             self.clamp_to_box_stencil()
+            self.parent.update()
             return True
         return super(ImagesScatter, self).on_touch_move(touch)
 
@@ -86,21 +116,7 @@ class ImagesScatter(ScatterLayout):
 
 
 class MapWidget(ImagesScatter):
-    selected_point = None
-
-    def on_touch_down(self, touch):
-        if self.parent.parent.collide_point(touch.x, touch.y):
-            if touch.button == 'left':
-                self.selected_point = self.to_local(touch.x, touch.y)
-                self.draw_point()
-            super(MapWidget, self).on_touch_down(touch)
-
-    def draw_point(self):
-        if self.selected_point is not None:
-            self.canvas.after.clear()
-            with self.canvas.after:
-                Color(1, 0, 0)
-                Ellipse(pos=self.selected_point, size=(5, 5))
+    pass
 
 
 class GameScreen(Screen):

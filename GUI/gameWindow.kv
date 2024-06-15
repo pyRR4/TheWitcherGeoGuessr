@@ -25,10 +25,10 @@
         size: self.parent.size
         pos: self.parent.pos
 
-<MapWidget@ImagesScatter>:
+<MapWidget>:
     Image:
-        source: 'images/7.jpg'
-        fit_mode: "fill"
+        source: 'maps/novigrad_velen.jpg'
+        fit_mode: "scale-down"
         size: self.parent.size
         pos: self.parent.pos
 
@@ -56,13 +56,38 @@
                 size: self.size
 
         FloatLayout:
-            size_hint: 1, 1
+            size_hint: 1, 0.7
             BoxStencil:
-                size_hint: 0.4, 0.4
-                pos_hint: {'center_x': 0.75, 'center_y': 0.7}
+                size_hint: 0.4, 0.6
+                pos_hint: {'center_x': 0.75, 'center_y': 0.5}
                 ImageWidget:
 
-            BoxStencil:
-                size_hint: 0.4, 0.4
-                pos_hint: {'center_x': 0.25, 'center_y': 0.7}
+            MapBox:
+                size_hint: 0.4, 0.6
+                pos_hint: {'center_x': 0.25, 'center_y': 0.5}
                 MapWidget:
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.3
+
+            BoxLayout:
+                padding: 0.1 * self.width
+                size_hint: 0.6, 1
+
+                Button:
+                    text: "Confirm guess"
+
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 0.4, 1
+                Label:
+                    size_hint: 1, 0.3
+                    text: "Total score:"
+                Label:
+                    size_hint: 1, 0.3
+                    text: "Score:"
+                Label:
+                    size_hint: 1, 0.3
+                    text: "Accuracy:"
