@@ -1,11 +1,22 @@
+import os.path
+
 from kivy.graphics.transformation import Matrix
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
 from kivy.graphics import Ellipse, Color
+from kivy.uix.button import Button
+from kivy.uix.image import Image
+
+from TheWitcherGeoGuessr.backend.file_manager import random_map, random_image, images_path
+from TheWitcherGeoGuessr.backend.score_calculator import RoundEngine
+
+maps_path = (f"C:\\Users\\igopo\\OneDrive\\Pulpit\\Wszystko i nic\\IST 22-27\\IV sem\\JS\\TheWitcherGeoGuessr"
+            f"\\TheWitcherGeoGuessr\\maps\\")
 
 
 class BoxStencil(BoxLayout, StencilView):
@@ -30,7 +41,7 @@ class MapBox(BoxStencil):
                 x, y = self.point_to_draw
                 self.selected_point = transformation.inverse().transform_point(x, y, 0)
                 print(self.selected_point)
-                self.children[0].update()
+                print(calculate_image_coordinates(self.selected_point, self.children[0].children[0].children[0]))
             super(MapBox, self).on_touch_down(touch)
 
     def draw_point(self):
@@ -50,11 +61,19 @@ class MapBox(BoxStencil):
             self.draw_point()
 
 
-class ImagesScatter(ScatterLayout):
+class GameImage(Image):
     def __init__(self, **kwargs):
+        super(GameImage, self).__init__(**kwargs)
+        self.fit_mode = "scale-down"
+
+
+class ImagesScatter(ScatterLayout):
+    def __init__(self, source, **kwargs):
         super(ImagesScatter, self).__init__(**kwargs)
         self.dragging = False
         self.last_touch = None
+
+        self.add_widget(GameImage(source=source))
 
     def on_touch_down(self, touch):
         if self.parent.collide_point(touch.x, touch.y):
@@ -121,4 +140,82 @@ class MapWidget(ImagesScatter):
 
 class GameScreen(Screen):
     Builder.load_file('GUI/gameWindow.kv')
+
+    def __init__(self, **kwargs):
+        super(GameScreen, self).__init__(**kwargs)
+        self.game_map = random_map()
+        self.img = random_image(self.game_map)
+        self.round_engine = RoundEngine(self.game_map, self.img)
+        self.map_box = None
+        self.screen_layout = self.main_layout()
+
+        self.add_widget(self.screen_layout)
+
+    def main_layout(self):
+        box_layout = BoxLayout(orientation='vertical', size_hint=(1, 1))
+        float_layout = FloatLayout(size_hint=(1, 0.7))
+
+        box_stencil = BoxStencil(size_hint=(0.4, 0.6), pos_hint={'center_x': 0.75, 'center_y': 0.5})
+        box_stencil.add_widget(ImagesScatter(os.path.join(images_path, self.game_map, self.img, "image.jpg")))
+        float_layout.add_widget(box_stencil)
+
+        self.map_box = MapBox(size_hint=(0.4, 0.6), pos_hint={'center_x': 0.25, 'center_y': 0.5})
+        self.map_box.add_widget(ImagesScatter(os.path.join(maps_path, f"{self.game_map}.jpg")))
+        float_layout.add_widget(self.map_box)
+
+        box_layout.add_widget(float_layout)
+
+        box_layout.add_widget(self.button_labels_layout())
+
+        return box_layout
+
+    def button_labels_layout(self):
+        box_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.3))
+
+        first_inner_layout = BoxLayout(orientation='vertical', size_hint=(0.6, 1), padding=0.1 * self.width)
+        first_inner_layout.add_widget(ConfirmButton())
+        box_layout.add_widget(first_inner_layout)
+
+        second_inner_layout = BoxLayout(orientation='vertical', size_hint=(0.4, 1))
+        #second_inner_layout.add_widget()
+        box_layout.add_widget(second_inner_layout)
+
+        return box_layout
+
+
+class ConfirmButton(Button):
+
+    def __init__(self, **kwargs):
+        super(ConfirmButton, self).__init__(**kwargs)
+        self.is_confirmed = False
+
+    def on_release(self):
+        if not self.is_confirmed:
+            coordinates = calculate_image_coordinates(self.get_root_window().selected_point,
+                                                      self.children[0].children[0].children[0])
+            labels_layout = self.parent.parent.children[1]
+
+
+def calculate_image_coordinates(point, image):
+    app_x, app_y, app_z = point
+
+    image_width, image_height = image.texture.size
+
+    widget_width, widget_height = image.parent.parent.size
+    widget_x, widget_y = image.pos
+
+    scale_x = widget_width / image_width
+    scale_y = widget_height / image_height
+    scale = min(scale_x, scale_y) #mniejsza skala jest poprawna, bez marginesow
+
+    display_width = image_width * scale
+    display_height = image_height * scale
+
+    padding_x = (widget_width - display_width) / 2
+    padding_y = (widget_height - display_height) / 2
+
+    image_x = (app_x - widget_x - padding_x) / scale
+    image_y = (app_y - widget_y - padding_y) / scale
+
+    return image_x, image_y
 

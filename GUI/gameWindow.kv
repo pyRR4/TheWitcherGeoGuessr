@@ -9,28 +9,6 @@
     scale_min: 1.0
     scale_max: 10.0
 
-    canvas.before:
-        Color:
-            rgba: 0, 0, 0, 0.1
-
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-
-<ImageWidget@ImagesScatter>:
-    Image:
-        source: 'images/2.jpg'
-        fit_mode: "fill"
-        size: self.parent.size
-        pos: self.parent.pos
-
-<MapWidget>:
-    Image:
-        source: 'maps/novigrad_velen.jpg'
-        fit_mode: "scale-down"
-        size: self.parent.size
-        pos: self.parent.pos
 
 <GameScreen>:
     size_hint: 1, 1
@@ -42,52 +20,3 @@
         Rectangle:
             pos: self.pos
             size: self.size
-
-
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: 1, 1
-        canvas.before:
-            Color:
-                rgba: 0, 0, 0, 0.8
-
-            Rectangle:
-                pos: self.pos
-                size: self.size
-
-        FloatLayout:
-            size_hint: 1, 0.7
-            BoxStencil:
-                size_hint: 0.4, 0.6
-                pos_hint: {'center_x': 0.75, 'center_y': 0.5}
-                ImageWidget:
-
-            MapBox:
-                size_hint: 0.4, 0.6
-                pos_hint: {'center_x': 0.25, 'center_y': 0.5}
-                MapWidget:
-
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: 1, 0.3
-
-            BoxLayout:
-                padding: 0.1 * self.width
-                size_hint: 0.6, 1
-
-                Button:
-                    text: "Confirm guess"
-
-
-            BoxLayout:
-                orientation: 'vertical'
-                size_hint: 0.4, 1
-                Label:
-                    size_hint: 1, 0.3
-                    text: "Total score:"
-                Label:
-                    size_hint: 1, 0.3
-                    text: "Score:"
-                Label:
-                    size_hint: 1, 0.3
-                    text: "Accuracy:"
