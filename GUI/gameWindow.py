@@ -193,7 +193,7 @@ class GameScreen(Screen):
     def button_labels_layout(self):
         box_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.3))
 
-        first_inner_layout = BoxLayout(orientation='vertical', size_hint=(0.6, 1), padding=(0.1 * self.width))
+        first_inner_layout = BoxLayout(orientation='vertical', size_hint=(0.6, 1), padding=box_layout.width)
         first_inner_layout.add_widget(ConfirmButton())
         box_layout.add_widget(first_inner_layout)
 
@@ -215,18 +215,18 @@ class GameScreen(Screen):
             score = round_engine.get_score_from_point(coordinates)
             accuracy = round_engine.get_accuracy()
         else:
-            score = "-"
-            accuracy = "-"
+            score = 0.0
+            accuracy = 0.0
 
         second_box = BoxLayout(orientation='vertical')
-        second_box.add_widget(StatLabel(text=f'{score}'))
-        second_box.add_widget(StatLabel(text=f'{accuracy}'))
+        second_box.add_widget(StatLabel(text=f'{score:.2f}'))
+        second_box.add_widget(StatLabel(text=f'{accuracy:.2f}'))
 
         app_engine = App.get_running_app().game_engine
 
         if coordinates is not None:
             app_engine.append_score(score)
-        second_box.add_widget(StatLabel(text=f'{app_engine.get_total_score()}'))
+        second_box.add_widget(StatLabel(text=f'{float(app_engine.get_total_score()):.2f}'))
 
         labels_layout.add_widget(second_box)
 
@@ -243,6 +243,7 @@ class ConfirmButton(Button):
     def __init__(self, **kwargs):
         super(ConfirmButton, self).__init__(**kwargs)
         self.is_confirmed = False
+        self.text = "Confirm guess"
 
     def on_release(self):
         if not self.is_confirmed:
@@ -264,6 +265,7 @@ class ConfirmButton(Button):
                 map_box.canvas.ask_update()
 
                 #zmiana wygladu buttona
+                self.text = "Next round"
 
                 self.is_confirmed = True
             else:
@@ -298,7 +300,7 @@ def calculate_image_coordinates(point, image):
     widget_x, widget_y = image.pos
 
     image_x = (app_x - widget_x - padding_x) / scale
-    image_y = (app_y - widget_y - padding_y) / scale
+    image_y = image.texture.height - (app_y - widget_y - padding_y) / scale
 
     return image_x, image_y
 
