@@ -1,23 +1,86 @@
-#:kivy 1.0.9
-
 <BaseMenuLayout>
     size_hint: 1 / 2, 2 / 3
     pos_hint: {'center_x': 0.6, 'center_y': 0.5}
     padding: 0.001 * self.width
     canvas:
         Color:
-            rgba: 0.0, 0.0, 0.0, 0.8
-
+            rgba: 0.0, 0.0, 0.0, 0.4
         Rectangle:
             pos: self.pos
             size: self.size
 
 
-<OptionsLayout>:
+
+<ImageRemoveLayout>:
+    size_hint: 1 / 2, 2 / 3
+    pos_hint: {'center_x': 0.6, 'center_y': 0.5}
+    padding: 0.001 * self.width
+    canvas:
+        Color:
+            rgba: 0.0, 0.0, 0.0, 0.4
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<ImageUploadLayout>:
+
     BoxLayout:
-        BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, 1
+        pos: self.parent.pos
+
+        Label:
+            text: "Provide image information:"
 
         BoxLayout:
+            BoxLayout:
+                orientation: 'vertical'
+
+                Label:
+                    text: "Coordinates:"
+
+                BoxLayout:
+                    TextInput:
+                        id: coordinate_x
+                    TextInput:
+                        id: coordinate_y
+
+            BoxLayout:
+
+                orientation: 'vertical'
+
+                Label:
+                    text: "Map:"
+                BoxLayout:
+                    Button:
+                        text: "Velen and Novigrad"
+                        on_release: root.select_map('velen_novigrad')
+                    Button:
+                        text: "Skellige"
+                        on_release: root.select_map('skellige')
+                    Button:
+                        text: "Kaer Morhen"
+                        on_release: root.select_map('kaer_morhen')
+                    Button:
+                        text: "White Orchard"
+                        on_release: root.select_map('bialy_sad')
+
+        BoxLayout:
+            BoxLayout:
+
+                Label:
+                    id: status_label
+                    text: "No image selected"
+
+                Button:
+                    text: "Select image"
+                    on_release: root.show_file_chooser()
+
+            Button:
+                text: "Submit"
+                on_release: root.submit()
+
 
 <AnimationScreen>:
     canvas:
@@ -35,15 +98,6 @@
         size_hint: 1 / 3, 1 / 3
         pos_hint: {'center_x': 0.25, 'center_y': 0.75}
         on_release: self.launch_basic_guessr()
-    GameChooseButton:
-        size_hint: 1 / 3, 1 / 3
-        pos_hint: {'center_x': 0.75, 'center_y': 0.25}
-    GameChooseButton:
-        size_hint: 1 / 3, 1 / 3
-        pos_hint: {'center_x': 0.75, 'center_y': 0.75}
-    GameChooseButton:
-        size_hint: 1 / 3, 1 / 3
-        pos_hint: {'center_x': 0.25, 'center_y': 0.25}
 
 
 <MainMenuBar>:
@@ -63,9 +117,16 @@
 <StartGameButton>:
     text: "Play"
 
+<GameTitleLabel@Label>:
+    text: "The Witcher GeoGuesser"
+    font_size: self.width / 12
 
-<OptionsButton>:
-    text: "Options"
+
+<ImageAddButton>:
+    text: "Add image"
+
+<ImageRemoveButton>:
+    text: "Remove image"
 
 
 <ExitButton>:
@@ -92,11 +153,19 @@
             pos_hint: {'center_x': 0.2, 'center_y': 0.5}
             size: (root.width / 4), root.height
 
+            GameTitleLabel:
+                pos_hint: {'center_x': 0.5, 'center_y': 0.9}
+                size_hint: (7 / 8), (1 / 12)
+
             StartGameButton:
                 pos_hint: {'center_x': 0.5, 'center_y': 0.7}
                 size_hint: (7 / 8), (1 / 12)
 
-            OptionsButton:
+            ImageAddButton:
+                pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+                size_hint: (7 / 8), (1 / 12)
+
+            ImageRemoveButton:
                 pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                 size_hint: (7 / 8), (1 / 12)
 

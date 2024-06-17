@@ -1,29 +1,27 @@
 import os
 import random
+import shutil
+
+from TheWitcherGeoGuessr.database.database_operations import get_items_by_map, get_unique_maps
 
 images_path = (f"C:\\Users\\igopo\\OneDrive\\Pulpit\\Wszystko i nic\\IST 22-27\\IV sem\\JS\\TheWitcherGeoGuessr"
-            f"\\TheWitcherGeoGuessr\\images\\")
+               f"\\TheWitcherGeoGuessr\\images\\")
 
 
-def get_file(game_map, number):
-    try:
-        path = os.path.join(images_path, game_map, number)
-        if os.path.exists(path):
-            with open(f"{path}/coordinates.txt", "rb") as file:
-                coordinates = get_coordinates(file.read())
-
-                return f"{path}\\img.jpg", coordinates
-    except FileNotFoundError:
-        return None, None
+def add_image(image):
+    if os.path.exists(os.path.join(images_path, os.path.basename(image))):
+        pass
+    elif os.path.exists(image):
+        shutil.copy(image, images_path)
+    else:
+        raise FileNotFoundError("Image not found")
 
 
-def get_coordinates(coordinates_string):
-    stripped = coordinates_string.strip()
-    stripped = stripped[1:-1]
-    parts = stripped.split(b',')
-    result = tuple(float(part) for part in parts)
-
-    return result
+def remove_image(image):
+    if os.path.exists(image):
+        os.remove(image)
+    else:
+        raise FileNotFoundError("Image not found")
 
 
 def get_file_count(game_map):
@@ -43,30 +41,13 @@ def get_file_count(game_map):
         return None
 
 
-def create_folder_with_file(game_map, x, y):
-    try:
-        path = os.path.join(images_path, game_map)
-
-        if not os.path.exists(path):
-            raise ValueError("Podana mapa nie istnieje.")
-
-        folder_path = os.path.join(path, str(get_file_count(game_map) + 1))
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        file_path = os.path.join(folder_path, 'coordinates.txt')
-
-        with open(file_path, 'w') as file:
-            file.write(f"{x},{y}")
-            file.close()
-
-    except FileNotFoundError:
-        pass
-
-
 def random_map():
     try:
-        selected_map = random_dir(images_path)
+        maps = get_unique_maps('images_database')
+        if len(maps) > 0:
+            selected_map = random.choice(maps)
+        else:
+            selected_map = None
         #return selected_map
         return "velen_novigrad"
     except FileNotFoundError:
@@ -75,8 +56,12 @@ def random_map():
 
 def random_image(game_map):
     try:
-        selected_image = random_dir(os.path.join(images_path, game_map))
-        return selected_image
+        images = get_items_by_map('images_database', game_map)
+        if len(images) > 0:
+            selected_image = random.choice(images)
+        else:
+            return None
+        return selected_image['img_path']
     except FileNotFoundError:
         return None
 

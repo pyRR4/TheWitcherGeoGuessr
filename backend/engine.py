@@ -1,6 +1,6 @@
 import math
 
-from TheWitcherGeoGuessr.backend.file_manager import get_file
+from TheWitcherGeoGuessr.database.database_operations import get_coordinates_by_path
 
 
 class GameEngine:
@@ -23,12 +23,16 @@ class GameEngine:
         else:
             return True
 
+    def get_rounds(self):
+        return self.total_rounds
+
 
 class RoundEngine:
 
-    def __init__(self, game_map, number, selected_point=None):
+    def __init__(self, path, selected_point=None):
         self.selected_point = selected_point
-        self.img, self.actual_point = get_file(game_map, number)
+        self.img = path
+        self.actual_point = get_coordinates_by_path('images_database', path)
         self.score = 0
         self.accuracy = 0
 

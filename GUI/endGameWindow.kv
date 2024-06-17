@@ -2,6 +2,7 @@
 
 <BackToMenuButton>:
     text: "Back to main menu"
+    font_size: self.width / 30
 
 <EndGameScreen>:
     points_label: points_label
@@ -28,16 +29,19 @@
                 Label:
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                     text: "Congratulations!"
+                    font_size: self.width / 12
             FloatLayout:
                 size_hint: 1, 0.25
                 Label:
                     pos_hint: {'center_x': 0.5, 'center_y': 0.3}
                     text: "You managed to achieve: "
+                    font_size: self.width / 30
             FloatLayout:
                 size_hint: 1, 0.25
                 PointsLabel:
                     id: points_label
                     pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+                    font_size: self.width / 16
         FloatLayout:
             size_hint: 1, 0.3
             BackToMenuButton:

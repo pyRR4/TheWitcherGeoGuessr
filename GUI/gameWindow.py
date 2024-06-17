@@ -14,8 +14,8 @@ from kivy.uix.button import Button
 from kivy.uix.image import Image
 
 from TheWitcherGeoGuessr.GUI.mainWindow import switch_screens
-from TheWitcherGeoGuessr.backend.file_manager import random_map, random_image, images_path
-from TheWitcherGeoGuessr.backend.engine import RoundEngine
+from TheWitcherGeoGuessr.backend.file_manager import random_map, random_image
+from TheWitcherGeoGuessr.backend.engine import RoundEngine, GameEngine
 
 maps_path = (f"C:\\Users\\igopo\\OneDrive\\Pulpit\\Wszystko i nic\\IST 22-27\\IV sem\\JS\\TheWitcherGeoGuessr"
              f"\\TheWitcherGeoGuessr\\maps\\")
@@ -172,7 +172,7 @@ class GameScreen(Screen):
         super(GameScreen, self).__init__(**kwargs)
         self.game_map = random_map()
         self.img = random_image(self.game_map)
-        self.round_engine = RoundEngine(self.game_map, self.img)
+        self.round_engine = RoundEngine(self.img)
         self.map_box = None
 
         self.add_widget(self.main_layout())
@@ -182,7 +182,7 @@ class GameScreen(Screen):
         float_layout = FloatLayout(size_hint=(1, 0.7))
 
         box_stencil = BoxStencil(size_hint=(0.4, 0.6), pos_hint={'center_x': 0.75, 'center_y': 0.5})
-        box_stencil.add_widget(ImagesScatter(os.path.join(images_path, self.game_map, self.img, "image.jpg")))
+        box_stencil.add_widget(ImagesScatter(self.img))
         float_layout.add_widget(box_stencil)
 
         self.map_box = MapBox(size_hint=(0.4, 0.6), pos_hint={'center_x': 0.25, 'center_y': 0.5})
@@ -237,10 +237,18 @@ class GameScreen(Screen):
 
         return labels_layout
 
+    def update_labels(self, coordinates=None):
+        parent_layout = self.children[0].children[0]
+        labels_layout = self.children[0].children[0].children[0]
+        parent_layout.remove_widget(labels_layout)
+
+        parent_layout.add_widget(self.labels_layout(coordinates))
+
 
 class StatLabel(Label):
     def __init__(self, **kwargs):
         super(StatLabel, self).__init__(**kwargs)
+        self.font_size = self.width / 3
 
 
 class ConfirmButton(Button):
@@ -249,6 +257,7 @@ class ConfirmButton(Button):
         super(ConfirmButton, self).__init__(**kwargs)
         self.is_confirmed = False
         self.text = "Confirm guess"
+        self.font_size = self.width / 3
 
     def on_release(self):
         if not self.is_confirmed:
@@ -257,11 +266,8 @@ class ConfirmButton(Button):
             if map_box.selected_point:
                 coordinates = calculate_image_coordinates(map_box.selected_point,
                                                           map_box.children[0].children[0].children[0])
-                parent_layout = self.parent.parent
-                labels_layout = self.parent.parent.children[0]
-                parent_layout.remove_widget(labels_layout)
 
-                parent_layout.add_widget(game_screen.labels_layout(coordinates))
+                game_screen.update_labels(coordinates)
 
                 actual_point = calculate_app_coordinates(game_screen.round_engine.actual_point,
                                                          map_box.children[0].children[0].children[0])
@@ -276,13 +282,14 @@ class ConfirmButton(Button):
                 pass
         else:
             root_window = App.get_running_app()
+            old_window = root_window.game_screen
+            root_window.game_screen = GameScreen(name='guessr_game')
             if root_window.game_engine.new_round():
-                old_window = root_window.game_screen
-                root_window.game_screen = GameScreen(name='guessr_game')
                 switch_screens(self, 'guessr_game', (root_window.sm, old_window,
                                                      root_window.game_screen))
             else:
-                switch_screens(self, 'end_game')
+                switch_screens(self, 'end_game', (root_window.sm, old_window,
+                                                  root_window.game_screen))
 
 
 def calculate_scale_and_padding(image, widget):
