@@ -1,14 +1,16 @@
 import os.path
 
+from kivy.app import App
 from kivy.graphics.transformation import Matrix
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.label import Label
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
-from kivy.graphics import Ellipse, Color
+from kivy.graphics import Ellipse, Color, Callback
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 
@@ -31,6 +33,9 @@ class MapBox(BoxStencil):
         self.selected_point = None
         self.point_to_draw = None
         self.point_instruction = None
+        self.actual_point = None
+        self.actual_point_to_draw = None
+        self.actual_point_instruction = None
 
     def on_touch_down(self, touch):
         if self.parent.parent.collide_point(touch.x, touch.y):
@@ -52,6 +57,22 @@ class MapBox(BoxStencil):
                 Color(1, 0, 0)
                 self.point_instruction = Ellipse(pos=(self.point_to_draw[0] - 2.5, self.point_to_draw[1] - 2.5),
                                                  size=(5, 5))
+                self.canvas.ask_update()
+
+    def draw_actual_point(self):
+        if self.actual_point_instruction:
+            self.canvas.remove(self.actual_point_instruction)
+
+        transformation = self.children[0].transform
+        x, y, z = self.actual_point
+        self.actual_point_to_draw = transformation.transform_point(x, y, z)
+
+        with self.canvas:
+            print(self.actual_point_to_draw)
+            Color(1, 1, 1)
+            self.actual_point_instruction = Ellipse(pos=(self.actual_point_to_draw[0] - 2.5,
+                                                         self.actual_point_to_draw[1] - 2.5), size=(5, 5))
+            self.canvas.ask_update()
 
     def update(self):
         if self.point_to_draw is not None:
@@ -59,6 +80,7 @@ class MapBox(BoxStencil):
             x, y, z = self.selected_point
             self.point_to_draw = transformation.transform_point(x, y, z)
             self.draw_point()
+            self.draw_actual_point()
 
 
 class GameImage(Image):
@@ -147,9 +169,8 @@ class GameScreen(Screen):
         self.img = random_image(self.game_map)
         self.round_engine = RoundEngine(self.game_map, self.img)
         self.map_box = None
-        self.screen_layout = self.main_layout()
 
-        self.add_widget(self.screen_layout)
+        self.add_widget(self.main_layout())
 
     def main_layout(self):
         box_layout = BoxLayout(orientation='vertical', size_hint=(1, 1))
@@ -172,15 +193,49 @@ class GameScreen(Screen):
     def button_labels_layout(self):
         box_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.3))
 
-        first_inner_layout = BoxLayout(orientation='vertical', size_hint=(0.6, 1), padding=0.1 * self.width)
+        first_inner_layout = BoxLayout(orientation='vertical', size_hint=(0.6, 1), padding=(0.1 * self.width))
         first_inner_layout.add_widget(ConfirmButton())
         box_layout.add_widget(first_inner_layout)
 
-        second_inner_layout = BoxLayout(orientation='vertical', size_hint=(0.4, 1))
-        #second_inner_layout.add_widget()
-        box_layout.add_widget(second_inner_layout)
+        box_layout.add_widget(self.labels_layout())
 
         return box_layout
+
+    def labels_layout(self, coordinates=None):
+        labels_layout = BoxLayout(orientation='horizontal', size_hint=(0.4, 1))
+
+        first_box = BoxLayout(orientation='vertical')
+        first_box.add_widget(StatLabel(text='Score:'))
+        first_box.add_widget(StatLabel(text='Accuracy:'))
+        first_box.add_widget(StatLabel(text='Total score:'))
+
+        labels_layout.add_widget(first_box)
+        if coordinates is not None:
+            round_engine = self.round_engine
+            score = round_engine.get_score_from_point(coordinates)
+            accuracy = round_engine.get_accuracy()
+        else:
+            score = "-"
+            accuracy = "-"
+
+        second_box = BoxLayout(orientation='vertical')
+        second_box.add_widget(StatLabel(text=f'{score}'))
+        second_box.add_widget(StatLabel(text=f'{accuracy}'))
+
+        app_engine = App.get_running_app().game_engine
+
+        if coordinates is not None:
+            app_engine.append_score(score)
+        second_box.add_widget(StatLabel(text=f'{app_engine.get_total_score()}'))
+
+        labels_layout.add_widget(second_box)
+
+        return labels_layout
+
+
+class StatLabel(Label):
+    def __init__(self, **kwargs):
+        super(StatLabel, self).__init__(**kwargs)
 
 
 class ConfirmButton(Button):
@@ -191,22 +246,39 @@ class ConfirmButton(Button):
 
     def on_release(self):
         if not self.is_confirmed:
-            coordinates = calculate_image_coordinates(self.get_root_window().selected_point,
-                                                      self.children[0].children[0].children[0])
-            labels_layout = self.parent.parent.children[1]
+            game_screen = self.get_root_window().children[0].children[0]
+            map_box = game_screen.map_box
+            if map_box.selected_point:
+                coordinates = calculate_image_coordinates(map_box.selected_point,
+                                                          map_box.children[0].children[0].children[0])
+                parent_layout = self.parent.parent
+                labels_layout = self.parent.parent.children[0]
+                parent_layout.remove_widget(labels_layout)
+
+                parent_layout.add_widget(game_screen.labels_layout(coordinates))
+
+                actual_point = calculate_app_coordinates(game_screen.round_engine.actual_point,
+                                                           map_box.children[0].children[0].children[0])
+                map_box.actual_point = actual_point
+                map_box.draw_actual_point()
+                map_box.canvas.ask_update()
+
+                #zmiana wygladu buttona
+
+                self.is_confirmed = True
+            else:
+                pass
+        else:
+            pass
 
 
-def calculate_image_coordinates(point, image):
-    app_x, app_y, app_z = point
-
+def calculate_scale_and_padding(image, widget):
     image_width, image_height = image.texture.size
-
-    widget_width, widget_height = image.parent.parent.size
-    widget_x, widget_y = image.pos
+    widget_width, widget_height = widget.size
 
     scale_x = widget_width / image_width
     scale_y = widget_height / image_height
-    scale = min(scale_x, scale_y) #mniejsza skala jest poprawna, bez marginesow
+    scale = min(scale_x, scale_y)  # Mniejsza skala jest poprawna, bez marginesów
 
     display_width = image_width * scale
     display_height = image_height * scale
@@ -214,8 +286,35 @@ def calculate_image_coordinates(point, image):
     padding_x = (widget_width - display_width) / 2
     padding_y = (widget_height - display_height) / 2
 
+    return scale, padding_x, padding_y
+
+
+def calculate_image_coordinates(point, image):
+    app_x, app_y, app_z = point
+
+    widget = image.parent.parent
+    scale, padding_x, padding_y = calculate_scale_and_padding(image, widget)
+
+    widget_x, widget_y = image.pos
+
     image_x = (app_x - widget_x - padding_x) / scale
     image_y = (app_y - widget_y - padding_y) / scale
 
     return image_x, image_y
+
+
+def calculate_app_coordinates(image_point, image):
+    image_x, image_y = image_point
+
+    widget = image.parent.parent
+    scale, padding_x, padding_y = calculate_scale_and_padding(image, widget)
+
+    widget_x, widget_y = image.pos
+
+    app_x = image_x * scale + widget_x + padding_x
+    app_y = widget.height - (image_y * scale + widget_y + padding_y)
+
+    print(app_x, app_y)
+
+    return app_x, app_y, 0.0
 

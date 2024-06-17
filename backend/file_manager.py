@@ -67,7 +67,8 @@ def create_folder_with_file(game_map, x, y):
 def random_map():
     try:
         selected_map = random_dir(images_path)
-        return selected_map
+        #return selected_map
+        return "velen_novigrad"
     except FileNotFoundError:
         return None
 

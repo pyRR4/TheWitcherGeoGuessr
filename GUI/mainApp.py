@@ -4,11 +4,17 @@ from kivy.app import App
 
 from .gameWindow import GameScreen
 from .mainWindow import MainMenu, MainMenuScreenManager, AnimationScreen
+from TheWitcherGeoGuessr.backend.score_calculator import GameEngine
 
 kivy.require('2.3.0')
 
 
 class GuessrApp(App):
+
+    def __init__(self, **kwargs):
+        super(GuessrApp, self).__init__(**kwargs)
+        self.game_engine = GameEngine()
+
     def build(self):
         config = ConfigParser()
 

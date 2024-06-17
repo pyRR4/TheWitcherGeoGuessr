@@ -53,7 +53,7 @@
 
     canvas:
         Color:
-            rgba: 0.0, 0.0, 0.0, 0.8
+            rgba: 0.0, 0.0, 0.0, 0.4
 
         Rectangle:
             pos: self.pos
@@ -75,11 +75,19 @@
 
 <MainMenu>:
     Image:
-        source: 'images/velen_novigrad/3/image.jpg'
+        source: 'images/velen_novigrad/5/image.jpg'
         allow_stretch: True
 
     FloatLayout:
+        canvas:
+            Color:
+                rgba: 0, 0, 0, 0.75
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
         size: root.width, root.height
+
         MainMenuBar:
             pos_hint: {'center_x': 0.2, 'center_y': 0.5}
             size: (root.width / 4), root.height
