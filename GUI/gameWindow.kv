@@ -10,13 +10,19 @@
     scale_max: 10.0
 
 
+<FaderLayout>:
+    canvas:
+        Color:
+            rgba: 0, 0, 0, 0.75
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+
 <GameScreen>:
     size_hint: 1, 1
     size: root.width, root.height
-    canvas:
-        Color:
-            rgba: 0.6, 0.3, 0.6, 1
 
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    Image:
+        source: 'graphics/background.jpg'
+        allow_stretch: True

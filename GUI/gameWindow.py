@@ -3,22 +3,22 @@ import os.path
 from kivy.app import App
 from kivy.graphics.transformation import Matrix
 from kivy.lang import Builder
-from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
-from kivy.graphics import Ellipse, Color, Callback
+from kivy.graphics import Ellipse, Color
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 
+from TheWitcherGeoGuessr.GUI.mainWindow import switch_screens
 from TheWitcherGeoGuessr.backend.file_manager import random_map, random_image, images_path
-from TheWitcherGeoGuessr.backend.score_calculator import RoundEngine
+from TheWitcherGeoGuessr.backend.engine import RoundEngine
 
 maps_path = (f"C:\\Users\\igopo\\OneDrive\\Pulpit\\Wszystko i nic\\IST 22-27\\IV sem\\JS\\TheWitcherGeoGuessr"
-            f"\\TheWitcherGeoGuessr\\maps\\")
+             f"\\TheWitcherGeoGuessr\\maps\\")
 
 
 class BoxStencil(BoxLayout, StencilView):
@@ -38,7 +38,7 @@ class MapBox(BoxStencil):
         self.actual_point_instruction = None
 
     def on_touch_down(self, touch):
-        if self.parent.parent.collide_point(touch.x, touch.y):
+        if self.collide_point(touch.x, touch.y):
             if touch.button == 'left':
                 self.point_to_draw = self.to_local(touch.x, touch.y)
                 self.draw_point()
@@ -75,11 +75,12 @@ class MapBox(BoxStencil):
             self.canvas.ask_update()
 
     def update(self):
-        if self.point_to_draw is not None:
+        if self.point_to_draw:
             transformation = self.children[0].transform
             x, y, z = self.selected_point
             self.point_to_draw = transformation.transform_point(x, y, z)
             self.draw_point()
+        if self.actual_point:
             self.draw_actual_point()
 
 
@@ -160,6 +161,10 @@ class MapWidget(ImagesScatter):
     pass
 
 
+class FaderLayout(BoxLayout):
+    pass
+
+
 class GameScreen(Screen):
     Builder.load_file('GUI/gameWindow.kv')
 
@@ -173,7 +178,7 @@ class GameScreen(Screen):
         self.add_widget(self.main_layout())
 
     def main_layout(self):
-        box_layout = BoxLayout(orientation='vertical', size_hint=(1, 1))
+        box_layout = FaderLayout(orientation='vertical', size_hint=(1, 1))
         float_layout = FloatLayout(size_hint=(1, 0.7))
 
         box_stencil = BoxStencil(size_hint=(0.4, 0.6), pos_hint={'center_x': 0.75, 'center_y': 0.5})
@@ -259,19 +264,25 @@ class ConfirmButton(Button):
                 parent_layout.add_widget(game_screen.labels_layout(coordinates))
 
                 actual_point = calculate_app_coordinates(game_screen.round_engine.actual_point,
-                                                           map_box.children[0].children[0].children[0])
+                                                         map_box.children[0].children[0].children[0])
                 map_box.actual_point = actual_point
                 map_box.draw_actual_point()
                 map_box.canvas.ask_update()
 
-                #zmiana wygladu buttona
                 self.text = "Next round"
 
                 self.is_confirmed = True
             else:
                 pass
         else:
-            pass
+            root_window = App.get_running_app()
+            if root_window.game_engine.new_round():
+                old_window = root_window.game_screen
+                root_window.game_screen = GameScreen(name='guessr_game')
+                switch_screens(self, 'guessr_game', (root_window.sm, old_window,
+                                                     root_window.game_screen))
+            else:
+                switch_screens(self, 'end_game')
 
 
 def calculate_scale_and_padding(image, widget):
@@ -319,4 +330,3 @@ def calculate_app_coordinates(image_point, image):
     print(app_x, app_y)
 
     return app_x, app_y, 0.0
-

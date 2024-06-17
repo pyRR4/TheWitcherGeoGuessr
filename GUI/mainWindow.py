@@ -1,8 +1,5 @@
-import time
-
 from kivy.animation import Animation
 from kivy.app import App
-from kivy.properties import ObjectProperty
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
@@ -79,16 +76,27 @@ class GameChooseLayout(BaseMenuLayout):
 
 class GameChooseButton(Button):
     def launch_basic_guessr(self):
-
-        App.get_running_app().sm.current = 'animation_screen'
-        anim = Animation(duration=1.0)
-        anim.bind(on_complete=self.do_fade_transition)
-        anim.start(self)
-
-    def do_fade_transition(self, *args):
-        App.get_running_app().sm.current = 'guessr_game'
+        switch_screens(self, 'guessr_game')
 
 
 class ExitButton(Button):
     pass
+
+
+def switch_screens(obj, screen, widgets=None):
+    App.get_running_app().sm.current = 'animation_screen'
+    anim = Animation(duration=1.0)
+    if widgets and len(widgets) == 3:
+        anim.bind(on_start=lambda x, y: switch_widgets(widgets[0], widgets[1], widgets[2]))
+    anim.bind(on_complete=lambda x, y: do_fade_transition(screen))
+    anim.start(obj)
+
+
+def switch_widgets(parent_widget, old_widget, new_widget):
+    parent_widget.remove_widget(old_widget)
+    parent_widget.add_widget(new_widget)
+
+
+def do_fade_transition(screen, *args):
+    App.get_running_app().sm.current = screen
 

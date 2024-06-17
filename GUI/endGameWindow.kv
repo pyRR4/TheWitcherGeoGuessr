@@ -1,0 +1,45 @@
+<PointsLabel>:
+
+<BackToMenuButton>:
+    text: "Back to main menu"
+
+<EndGameScreen>:
+    points_label: points_label
+    Image:
+        source: 'graphics/background.jpg'
+        allow_stretch: True
+
+    BoxLayout:
+        canvas:
+            Color:
+                rgba: 0, 0, 0, 0.75
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
+        size_hint: 1, 1
+        orientation: 'vertical'
+
+        BoxLayout:
+            size_hint: 1, 0.7
+            orientation: 'vertical'
+            FloatLayout:
+                size_hint: 1, 0.5
+                Label:
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    text: "Congratulations!"
+            FloatLayout:
+                size_hint: 1, 0.25
+                Label:
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+                    text: "You managed to achieve: "
+            FloatLayout:
+                size_hint: 1, 0.25
+                PointsLabel:
+                    id: points_label
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+        FloatLayout:
+            size_hint: 1, 0.3
+            BackToMenuButton:
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                size_hint: 0.5, 0.4

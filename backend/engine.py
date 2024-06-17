@@ -4,14 +4,24 @@ from TheWitcherGeoGuessr.backend.file_manager import get_file
 
 
 class GameEngine:
-    def __init__(self):
+    def __init__(self, total_rounds):
         self.total_score = 0
+        self.total_rounds = total_rounds
+        self.current_round = 0
 
     def get_total_score(self):
         return self.total_score
 
     def append_score(self, score):
         self.total_score += score
+
+    def new_round(self):
+        self.current_round += 1
+
+        if self.current_round >= self.total_rounds:
+            return False
+        else:
+            return True
 
 
 class RoundEngine:
