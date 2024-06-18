@@ -5,19 +5,19 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
-from TheWitcherGeoGuessr.GUI.mainWindow import switch_screens
-from TheWitcherGeoGuessr.backend.engine import GameEngine
+import TheWitcherGeoGuessr.GUI.mainWindow as main_window
+import TheWitcherGeoGuessr.backend.engine as engine
 
 
 class EndGameScreen(Screen):
-    Builder.load_file('GUI/endGameWindow.kv')
+    Builder.load_file('TheWitcherGeoGuessr\\GUI\\endGameWindow.kv')
     points_label = ObjectProperty(None)
 
     def on_enter(self):
         self.points_label.text = f"{App.get_running_app().game_engine.get_total_score():.2f} points"
 
         total_rounds = App.get_running_app().game_engine.get_rounds()
-        App.get_running_app().game_engine = GameEngine(total_rounds)
+        App.get_running_app().game_engine = engine.GameEngine(total_rounds)
         App.get_running_app().game_screen.update_labels()
 
 
@@ -27,5 +27,5 @@ class PointsLabel(Label):
 
 class BackToMenuButton(Button):
     def on_release(self):
-        switch_screens(self, 'menu')
+        main_window.switch_screens(self, 'menu')
 

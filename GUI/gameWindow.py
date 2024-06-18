@@ -166,7 +166,7 @@ class FaderLayout(BoxLayout):
 
 
 class GameScreen(Screen):
-    Builder.load_file('GUI/gameWindow.kv')
+    Builder.load_file('TheWitcherGeoGuessr\\GUI\\gameWindow.kv')
 
     def __init__(self, **kwargs):
         super(GameScreen, self).__init__(**kwargs)

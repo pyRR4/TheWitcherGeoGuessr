@@ -12,11 +12,11 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.lang import Builder
 
-from TheWitcherGeoGuessr.GUI.selectable_view import RV
-from TheWitcherGeoGuessr.backend.file_manager import add_image, remove_image, images_path
-from TheWitcherGeoGuessr.database.database_operations import load_image, get_all_images, delete_image_by_id
+from .selectable_view import RV
+import TheWitcherGeoGuessr.backend.file_manager as file_manager
+import TheWitcherGeoGuessr.database.database_operations as database_operations
 
-Builder.load_file('GUI/mainWindow.kv')
+Builder.load_file('TheWitcherGeoGuessr\\GUI\\mainWindow.kv')
 
 
 class MainMenu(Screen):
@@ -139,9 +139,9 @@ class ImageUploadLayout(BaseMenuLayout):
             coordinate_x = float(self.ids.coordinate_x.text)
             coordinate_y = float(self.ids.coordinate_y.text)
 
-            load_image('images_database', os.path.join(images_path, os.path.basename(self.path)), self.map,
+            database_operations.load_image('images_database', os.path.join(file_manager.images_path, os.path.basename(self.path)), self.map,
                        (coordinate_x, coordinate_y))
-            add_image(self.path)
+            file_manager.add_image(self.path)
             remove_layout = App.get_running_app().sm.current_screen.image_remove_layout
             remove_layout.update_rv_data()
 
@@ -155,7 +155,7 @@ class ImageRemoveLayout(BaseMenuLayout):
     def __init__(self, **kwargs):
         super(ImageRemoveLayout, self).__init__(**kwargs)
         self.selected_item = None
-        self.data = get_all_images('images_database')
+        self.data = database_operations.get_all_images('images_database')
         self.rv = RV()
         box_layout = BoxLayout(orientation='vertical', size_hint=(1, 1), pos_hint={'center_x': 0.5, 'center_y': 0.5})
         self.update_rv_data()
@@ -176,12 +176,12 @@ class ImageRemoveLayout(BaseMenuLayout):
             for item in self.data:
                 if str(item['id']) == self.selected_item:
                     self.data.remove(item)
-                    delete_image_by_id('images_database', self.selected_item)
-                    remove_image(item['img_path'])
+                    database_operations.delete_image_by_id('images_database', self.selected_item)
+                    file_manager.remove_image(item['img_path'])
                     self.update_rv_data()
 
     def update_rv_data(self):
-        self.data = get_all_images('images_database')
+        self.data = database_operations.get_all_images('images_database')
         self.rv.data = [{'viewclass': 'SelectableLabel',
                          'text': f'id: {item["id"]}, map: {item["map"]}, '
                                  f'coordinates: {item["coordinate_x"]}, {item["coordinate_y"]}',

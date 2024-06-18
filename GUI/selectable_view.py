@@ -9,7 +9,7 @@ from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 
 
-Builder.load_file('GUI/selectable_view.kv')
+Builder.load_file('TheWitcherGeoGuessr\\GUI\\selectable_view.kv')
 
 
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
