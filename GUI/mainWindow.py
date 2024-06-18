@@ -121,11 +121,18 @@ class ImageUploadLayout(BaseMenuLayout):
         if selection:
             selected_file = selection[0]
             self.path = selected_file
-            self.ids.status_label.text = f'Wybrano plik: {selected_file}'
+            self.ids.status_label.text = selected_file
             self.popup.dismiss()
 
     def select_map(self, selected_map):
         self.map = selected_map
+        map_dict = {
+            'velen_novigrad': "Velen and Novigrad",
+            'skellige': "Skellige",
+            'kaer_morhen': "Kaer Morhen",
+            "bialy_sad": "White Orchard"
+        }
+        self.ids.map_status.children[0].text = map_dict[selected_map]
 
     def submit(self):
         try:
@@ -190,7 +197,7 @@ class GameChooseButton(Button):
         switch_screens(self, 'guessr_game')
 
 
-class ExitButton(Button):
+class ExitButton(MainMenuBarButton):
     pass
 
 
