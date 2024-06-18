@@ -5,12 +5,12 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
-import TheWitcherGeoGuessr.GUI.mainWindow as main_window
-import TheWitcherGeoGuessr.backend.engine as engine
+from GUI import mainWindow as main_window
+import backend.engine as engine
 
 
 class EndGameScreen(Screen):
-    Builder.load_file('TheWitcherGeoGuessr\\GUI\\endGameWindow.kv')
+    Builder.load_file('GUI\\endGameWindow.kv')
     points_label = ObjectProperty(None)
 
     def on_enter(self):

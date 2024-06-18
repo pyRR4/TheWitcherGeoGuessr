@@ -5,7 +5,7 @@ from kivy.app import App
 from .endGameWindow import EndGameScreen
 from .gameWindow import GameScreen
 from .mainWindow import MainMenu, MainMenuScreenManager, AnimationScreen
-from TheWitcherGeoGuessr.backend.engine import GameEngine
+from backend.engine import GameEngine
 
 kivy.require('2.3.0')
 

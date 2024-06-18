@@ -1,6 +1,6 @@
 import math
 
-from TheWitcherGeoGuessr.database.database_operations import get_coordinates_by_path
+from database.database_operations import get_coordinates_by_path
 
 
 class GameEngine:

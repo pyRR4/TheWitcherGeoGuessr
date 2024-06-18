@@ -1,5 +1,4 @@
 import os
-import shutil
 
 from kivy.animation import Animation
 from kivy.app import App
@@ -13,10 +12,10 @@ from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.lang import Builder
 
 from .selectable_view import RV
-import TheWitcherGeoGuessr.backend.file_manager as file_manager
-import TheWitcherGeoGuessr.database.database_operations as database_operations
+import backend.file_manager as file_manager
+import database.database_operations as database_operations
 
-Builder.load_file('TheWitcherGeoGuessr\\GUI\\mainWindow.kv')
+Builder.load_file('GUI\\mainWindow.kv')
 
 
 class MainMenu(Screen):

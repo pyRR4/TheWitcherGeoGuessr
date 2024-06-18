@@ -2,7 +2,7 @@ import os
 import random
 import shutil
 
-from TheWitcherGeoGuessr.database.database_operations import get_items_by_map, get_unique_maps
+from database.database_operations import get_items_by_map, get_unique_maps
 
 images_path = (f"C:\\Users\\igopo\\OneDrive\\Pulpit\\Wszystko i nic\\IST 22-27\\IV sem\\JS\\TheWitcherGeoGuessr"
                f"\\TheWitcherGeoGuessr\\images\\")

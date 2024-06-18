@@ -13,9 +13,9 @@ from kivy.graphics import Ellipse, Color
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 
-from TheWitcherGeoGuessr.GUI.mainWindow import switch_screens
-from TheWitcherGeoGuessr.backend.file_manager import random_map, random_image
-from TheWitcherGeoGuessr.backend.engine import RoundEngine, GameEngine
+from GUI.mainWindow import switch_screens
+from backend.file_manager import random_map, random_image
+from backend.engine import RoundEngine, GameEngine
 
 maps_path = (f"C:\\Users\\igopo\\OneDrive\\Pulpit\\Wszystko i nic\\IST 22-27\\IV sem\\JS\\TheWitcherGeoGuessr"
              f"\\TheWitcherGeoGuessr\\maps\\")
@@ -166,7 +166,7 @@ class FaderLayout(BoxLayout):
 
 
 class GameScreen(Screen):
-    Builder.load_file('TheWitcherGeoGuessr\\GUI\\gameWindow.kv')
+    Builder.load_file('GUI\\gameWindow.kv')
 
     def __init__(self, **kwargs):
         super(GameScreen, self).__init__(**kwargs)

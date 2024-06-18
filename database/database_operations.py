@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from TheWitcherGeoGuessr.database.create_database import Base, Images
+from database.create_database import Base, Images
 
 
 def create_session(db):
